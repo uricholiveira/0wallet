@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "0bit-pay"
+version = "0.1.0"
+description = ""
+authors = ["Urich Oliveira <oliveira.urich@gmail.com>"]
+readme = "README.md"
+packages = [{include = "0bit_pay"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.92.0"
+pydantic = {extras = ["email"], version = "^1.10.5"}
+sqlalchemy = "^2.0.4"
+arrow = "^1.2.3"
+uvicorn = "^0.20.0"
+alembic = "^1.9.4"
+python-jose = "^3.3.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+
+
+[tool.poetry.group.dev.dependencies]
+python-dotenv = "^0.21.1"
+pytest = "^7.2.1"
+pytest-mock = "^3.10.0"
+pytest-lazy-fixture = "^0.6.3"
+bump2version = "^1.0.1"
+pre-commit = "^3.0.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
