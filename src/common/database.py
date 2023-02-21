@@ -1,31 +1,37 @@
-from typing import Generator
+from contextlib import contextmanager, AbstractContextManager
+from typing import Generator, Callable
 
 from sqlalchemy import Column, Integer, create_engine
 from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy.orm import declared_attr, sessionmaker
+from sqlalchemy import orm
+from sqlalchemy.orm import Session, declared_attr
 
-from src.common.settings import settings
-
-SQLALCHEMY_DATABASE_URL = settings.database.url
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={},
-)
-SessionLocal = sessionmaker(
-    autocommit=settings.database.params.auto_commit,
-    autoflush=settings.database.params.auto_flush,
-    bind=engine,
-)
+from src.common.settings import settings, DatabaseConfig
 
 
-def get_session() -> Generator:
-    db = SessionLocal()
-    try:
-        db.begin()
-        yield db
-    finally:
-        db.close()
+class Database:
+    def __init__(self, db_config: DatabaseConfig) -> None:
+        self._engine = create_engine(db_config.url, echo=True)
+        self._session_factory = orm.scoped_session(
+            orm.sessionmaker(
+                autoflush=db_config.params.auto_flush,
+                bind=self._engine,
+            ),
+        )
+
+    def create_database(self) -> None:
+        Base.metadata.create_all(self._engine)
+
+    @contextmanager
+    def session(self) -> Callable[..., AbstractContextManager[Session]]:
+        session: Session = self._session_factory()
+        try:
+            yield session
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
 
 @as_declarative()
