@@ -1,12 +1,12 @@
-from contextlib import contextmanager, AbstractContextManager
-from typing import Generator, Callable
+import uuid
+from contextlib import AbstractContextManager, contextmanager
+from typing import Callable
 
-from sqlalchemy import Column, Integer, create_engine
+from sqlalchemy import UUID, Column, create_engine, orm
 from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy import orm
 from sqlalchemy.orm import Session, declared_attr
 
-from src.common.settings import settings, DatabaseConfig
+from src.common.settings import DatabaseConfig
 
 
 class Database:
@@ -36,10 +36,10 @@ class Database:
 
 @as_declarative()
 class Base:
-    id: str = Column(
-        Integer,
+    id: UUID = Column(
+        UUID,
         primary_key=True,
-        autoincrement=True,
+        default=uuid.uuid4(),
         nullable=False,
     )
     __name__: str

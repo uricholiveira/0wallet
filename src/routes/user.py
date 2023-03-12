@@ -1,6 +1,6 @@
 from typing import List
 
-from dependency_injector.wiring import inject, Provide
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
 from src.common.containers import Container
@@ -12,13 +12,35 @@ router = APIRouter(prefix="/user", tags=["User"])
 
 @router.get("/", response_model=List[UserResponse])
 @inject
-async def get_users(user_service: UserService = Depends(Provide[Container.user_service])):
-    print("asddsads")
+async def get_users(
+    user_service: UserService = Depends(Provide[Container.user_service]),
+):
     users = await user_service.get_users()
     return users
 
 
 @router.get("/{user_id}", response_model=UserResponse)
 @inject
-async def get_user(user_id: int, user_service: UserService = Depends(Provide[Container.user_service])):
+async def get_user(
+    user_id: int, user_service: UserService = Depends(Provide[Container.user_service])
+):
     return await user_service.get_user(user_id=user_id)
+
+
+@router.post("/", response_model=UserResponse)
+@inject
+async def create(
+    model: CreateUser,
+    user_service: UserService = Depends(Provide[Container.user_service]),
+):
+    return await user_service.create_user(model=model)
+
+
+@router.patch("/{user_id}", response_model=UserResponse)
+@inject
+async def update(
+    user_id: int,
+    model: CreateUser,
+    user_service: UserService = Depends(Provide[Container.user_service]),
+):
+    return await user_service.update_user(user_id=user_id, model=model)
