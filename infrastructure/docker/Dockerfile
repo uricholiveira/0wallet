@@ -25,4 +25,4 @@ COPY .. .
 
 CMD ["alembic", "upgrade", "head"]
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3000", "--reload"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "3000", "--reload"]
